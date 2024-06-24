@@ -12,5 +12,8 @@ class Program
             AnsiConsole.MarkupLine("[red]Error: Connection string not found in App.config[/]");
             return;
         }
+
+        var databaseManager = new DatabaseManager(connectionString);
+        await databaseManager.InitializeDatabaseAsync();
     }
 }
