@@ -1,19 +1,16 @@
-﻿using Spectre.Console;
-using System.Configuration;
-
-class Program
+﻿namespace CodingTracker
 {
-    static async Task Main(string[] args)
+    class Program
     {
-        var connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
-
-        if (string.IsNullOrEmpty(connectionString))
+        static async Task Main(string[] args)
         {
-            AnsiConsole.MarkupLine("[red]Error: Connection string not found in App.config[/]");
-            return;
-        }
+            var databaseManager = new DatabaseManager();
+            var userInterface = new UserInterface();
+            var inputValidator = new InputValidator();
+            var codingController = new CodingController(databaseManager, userInterface, inputValidator);
 
-        var databaseManager = new DatabaseManager(connectionString);
-        await databaseManager.InitializeDatabaseAsync();
+            await databaseManager.InitializeDatabaseAsync();
+            await codingController.RunAsync();
+        }
     }
 }

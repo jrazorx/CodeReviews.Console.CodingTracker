@@ -1,12 +1,15 @@
-﻿public class CodingSession
+﻿namespace CodingTracker
 {
-    public int Id { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public TimeSpan Duration { get; private set; }
-
-    public void CalculateDuration()
+    public class CodingSession
     {
-        Duration = EndTime - StartTime;
+        public int Id { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public TimeSpan Duration { get; private set; }
+
+        public void CalculateDuration()
+        {
+            Duration = EndTime - StartTime;
+        }
     }
 }

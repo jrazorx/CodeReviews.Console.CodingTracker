@@ -1,29 +1,30 @@
-﻿using Dapper;
+﻿using System.Configuration;
+using Dapper;
 using Microsoft.Data.Sqlite;
-using System.Data;
 
-public class DatabaseManager
+namespace CodingTracker
 {
-    private readonly string _connectionString;
-
-    public DatabaseManager(string connectionString)
+    public class DatabaseManager
     {
-        _connectionString = connectionString;
-    }
+        private readonly string _connectionString;
 
-    public async Task InitializeDatabaseAsync()
-    {
-        using var connection = new SqliteConnection(_connectionString);
-        await connection.OpenAsync();
+        public DatabaseManager()
+        {
+            _connectionString = ConfigurationManager.ConnectionStrings["CodingTrackerDB"].ConnectionString;
+        }
 
-        var tableCmd = @"
-            CREATE TABLE IF NOT EXISTS CodingSessions (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                StartTime TEXT NOT NULL,
-                EndTime TEXT NOT NULL,
-                Duration TEXT NOT NULL
-            )";
+        public async Task InitializeDatabaseAsync()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.OpenAsync();
 
-        await connection.ExecuteAsync(tableCmd);
+            await connection.ExecuteAsync(@"
+                CREATE TABLE IF NOT EXISTS CodingSessions (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    StartTime TEXT NOT NULL,
+                    EndTime TEXT NOT NULL,
+                    Duration TEXT NOT NULL
+                )");
+        }
     }
 }
