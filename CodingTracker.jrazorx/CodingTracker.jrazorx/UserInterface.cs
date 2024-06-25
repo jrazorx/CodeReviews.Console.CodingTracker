@@ -2,20 +2,6 @@
 
 namespace CodingTracker
 {
-    public enum MenuOption
-    {
-        Exit = 0,
-        CreateHabitType,
-        ViewHabitTypes,
-        UpdateHabitType,
-        DeleteHabitType,
-        CreateHabit,
-        ViewHabits,
-        UpdateHabit,
-        DeleteHabit,
-        GenerateYearlyReport
-    }
-
     public class UserInterface
     {
         public void DisplayMenu()
@@ -50,5 +36,12 @@ namespace CodingTracker
         {
             AnsiConsole.MarkupLine($"[red]Error: {message}[/]");
         }
+
+        public void WaitForKeyPress()
+        {
+            AnsiConsole.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
+        }
+
     }
 }

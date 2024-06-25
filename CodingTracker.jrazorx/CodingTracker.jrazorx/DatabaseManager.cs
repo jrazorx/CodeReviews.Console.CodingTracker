@@ -26,5 +26,18 @@ namespace CodingTracker
                     Duration TEXT NOT NULL
                 )");
         }
+
+        public async Task InsertSessionAsync(CodingSession session)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.ExecuteAsync(@"
+                INSERT INTO CodingSessions (StartTime, EndTime, Duration)
+                VALUES (@StartTime, @EndTime, @Duration)",
+                new {
+                    session.StartTime,
+                    session.EndTime,
+                    Duration = session.Duration.ToString()
+                });
+        }
     }
 }
