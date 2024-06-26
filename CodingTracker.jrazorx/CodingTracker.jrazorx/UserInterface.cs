@@ -43,11 +43,8 @@ namespace CodingTracker
 
         public DateTime GetDateTime(string prompt)
         {
-            var rule = new Rule("[blue]" + prompt + "[/]");
-            rule.LeftJustified();
-            AnsiConsole.Write(rule);
+            DisplayTitle(prompt);
 
-            // Get current date and time
             var now = DateTime.Now;
 
             // Year selection
@@ -187,6 +184,13 @@ namespace CodingTracker
         public void DisplayError(string message)
         {
             AnsiConsole.MarkupLine($"[red]Error: {message}[/]");
+        }
+
+        public void DisplayTitle(string title)
+        {
+            var rule = new Rule("[blue]" + title + "[/]");
+            rule.LeftJustified();
+            AnsiConsole.Write(rule);
         }
 
         public void WaitForKeyPress()
