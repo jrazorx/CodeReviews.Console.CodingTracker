@@ -39,7 +39,7 @@
                         await AddNewSessionAsync();
                         break;
                     case MenuOption.ViewAllSessions:
-                        //await ViewAllSessionsAsync();
+                        await ViewAllSessionsAsync();
                         break;
                     case MenuOption.UpdateSession:
                         //await UpdateSessionAsync();
@@ -108,10 +108,18 @@
             }
 
             var session = new CodingSession { StartTime = startTime, EndTime = endTime };
-            session.CalculateDuration();
 
             await _databaseManager.InsertSessionAsync(session);
             _userInterface.DisplayMessage("Coding session added successfully.");
+        }
+
+        private async Task ViewAllSessionsAsync(bool clearConsoleAtStart = true)
+        {
+            if (clearConsoleAtStart)
+                Console.Clear();
+
+            var sessions = await _databaseManager.GetAllSessionsAsync();
+            _userInterface.DisplaySessions(sessions);
         }
     }
 }

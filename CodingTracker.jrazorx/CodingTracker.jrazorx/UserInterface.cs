@@ -13,8 +13,8 @@ namespace CodingTracker
                     .Color(Color.Aqua));
 
             AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine("1. View all coding sessions");
-            AnsiConsole.WriteLine("2. Add new coding session");
+            AnsiConsole.WriteLine("1. Add new coding session");
+            AnsiConsole.WriteLine("2. View all coding sessions");
             AnsiConsole.WriteLine("3. Update coding session");
             AnsiConsole.WriteLine("4. Delete coding session");
             AnsiConsole.WriteLine("5. View coding statistics");
@@ -25,6 +25,26 @@ namespace CodingTracker
         public string GetUserInput(string prompt)
         {
             return AnsiConsole.Ask<string>(prompt);
+        }
+
+        public void DisplaySessions(List<CodingSession> sessions)
+        {
+            var table = new Table();
+            table.AddColumn("ID");
+            table.AddColumn("Start Time");
+            table.AddColumn("End Time");
+            table.AddColumn("Duration");
+
+            foreach (var session in sessions)
+            {
+                table.AddRow(
+                    session.Id.ToString(),
+                    session.StartTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    session.EndTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    session.GetFormattedDuration());
+            }
+
+            AnsiConsole.Write(table);
         }
 
         public void DisplayMessage(string message)

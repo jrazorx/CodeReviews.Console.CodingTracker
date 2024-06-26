@@ -5,11 +5,15 @@
         public int Id { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
-        public TimeSpan Duration { get; private set; }
 
-        public void CalculateDuration()
+        public TimeSpan GetDuration()
         {
-            Duration = EndTime - StartTime;
+            return EndTime - StartTime;
+        }
+
+        public string GetFormattedDuration()
+        {
+            return GetDuration().ToString(@"hh\:mm\:ss");
         }
     }
 }

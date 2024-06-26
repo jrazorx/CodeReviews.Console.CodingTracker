@@ -22,22 +22,23 @@ namespace CodingTracker
                 CREATE TABLE IF NOT EXISTS CodingSessions (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     StartTime TEXT NOT NULL,
-                    EndTime TEXT NOT NULL,
-                    Duration TEXT NOT NULL
+                    EndTime TEXT NOT NULL
                 )");
         }
 
         public async Task InsertSessionAsync(CodingSession session)
         {
             using var connection = new SqliteConnection(_connectionString);
-            await connection.ExecuteAsync(@"
-                INSERT INTO CodingSessions (StartTime, EndTime, Duration)
-                VALUES (@StartTime, @EndTime, @Duration)",
-                new {
-                    session.StartTime,
-                    session.EndTime,
-                    Duration = session.Duration.ToString()
-                });
+            await connection.ExecuteAsync(
+                "INSERT INTO CodingSessions (StartTime, EndTime) VALUES (@StartTime, @EndTime)",
+                new { session.StartTime, session.EndTime });
+        }
+
+        public async Task<List<CodingSession>> GetAllSessionsAsync()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            var sessions = await connection.QueryAsync<CodingSession>("SELECT * FROM CodingSessions");
+            return sessions.AsList();
         }
     }
 }
