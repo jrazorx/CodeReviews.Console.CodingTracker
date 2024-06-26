@@ -47,19 +47,20 @@ namespace CodingTracker
             rule.LeftJustified();
             AnsiConsole.Write(rule);
 
-            var today = DateTime.Now;
+            // Get current date and time
+            var now = DateTime.Now;
 
             // Year selection
             var year = AnsiConsole.Prompt(
                 new TextPrompt<int>("Enter the [green]year[/]: ")
-                    .DefaultValue(DateTime.Now.Year)
+                    .DefaultValue(now.Year)
                     .PromptStyle("yellow")
                     .ValidationErrorMessage("[red]That's not a valid year[/]")
                     .Validate(year =>
                     {
                         return year switch
                         {
-                            <  0 => ValidationResult.Error("[red]The year must be at least 0[/]"),
+                            < 0 => ValidationResult.Error("[red]The year must be at least 0[/]"),
                             >= 9999 => ValidationResult.Error("[red]The year must be less than 9999[/]"),
                             _ => ValidationResult.Success(),
                         };
@@ -80,10 +81,9 @@ namespace CodingTracker
                     };
                 });
 
-            // Add default value for month if year matches today's year
-            if (year == today.Year)
+            if (year == now.Year)
             {
-                monthPrompt = monthPrompt.DefaultValue(today.Month);
+                monthPrompt = monthPrompt.DefaultValue(now.Month);
             }
 
             var month = AnsiConsole.Prompt(monthPrompt);
@@ -106,21 +106,20 @@ namespace CodingTracker
                     return ValidationResult.Success();
                 });
 
-            // Add default value for day if year and month match today's date
-            if (year == today.Year && month == today.Month)
+            if (year == now.Year && month == now.Month)
             {
-                dayPrompt = dayPrompt.DefaultValue(today.Day);
+                dayPrompt = dayPrompt.DefaultValue(now.Day);
             }
 
             var day = AnsiConsole.Prompt(dayPrompt);
 
-            // Hour selection
-            var hourPrompt = new TextPrompt<int>("Enter the [green]hour[/] (0-23): ")
+            // Hours selection
+            var hoursPrompt = new TextPrompt<int>("Enter the [green]hour[/] (0-23): ")
                 .PromptStyle("yellow")
                 .ValidationErrorMessage("[red]That's not a valid hour[/]")
-                .Validate(hour =>
+                .Validate(hours =>
                 {
-                    return hour switch
+                    return hours switch
                     {
                         < 0 => ValidationResult.Error("[red]The hour must be 0 or greater[/]"),
                         > 23 => ValidationResult.Error("[red]The hour must be 23 or less[/]"),
@@ -128,35 +127,36 @@ namespace CodingTracker
                     };
                 });
 
-            if (year == today.Year && month == today.Month && day == today.Day)
+            if (year == now.Year && month == now.Month && day == now.Day)
             {
-                hourPrompt = hourPrompt.DefaultValue(today.Hour);
+                hoursPrompt = hoursPrompt.DefaultValue(now.Hour);
             }
 
-            var hour = AnsiConsole.Prompt(hourPrompt);
+            var hours = AnsiConsole.Prompt(hoursPrompt);
 
-            // Minute selection
-            var minutePrompt = new TextPrompt<int>("Enter the [green]minute[/] (0-59): ")
+            // Minutes selection
+            var minutesPrompt = new TextPrompt<int>("Enter the [green]minute[/] (0-59): ")
                 .PromptStyle("yellow")
                 .ValidationErrorMessage("[red]That's not a valid minute[/]")
-                .Validate(minute =>
+                .Validate(minutes =>
                 {
-                    return minute switch
+                    return minutes switch
                     {
-                        < 0 => ValidationResult.Error("[red]The minute must be 0 or greater[/]"),
-                        > 59 => ValidationResult.Error("[red]The minute must be 59 or less[/]"),
+                        < 0 => ValidationResult.Error("[red]The minutes must be 0 or greater[/]"),
+                        > 59 => ValidationResult.Error("[red]The minutes must be 59 or less[/]"),
                         _ => ValidationResult.Success(),
                     };
                 });
 
-            if (year == today.Year && month == today.Month && day == today.Day && hour == today.Hour)
+            if (year == now.Year && month == now.Month && day == now.Day && hours == now.Hour)
             {
-                minutePrompt = minutePrompt.DefaultValue(today.Minute);
+                minutesPrompt = minutesPrompt.DefaultValue(now.Minute);
             }
 
-            var minute = AnsiConsole.Prompt(minutePrompt);
+            var minutes = AnsiConsole.Prompt(minutesPrompt);
 
-            return new DateTime(year, 1, 1, 0, 0, 0);
+
+            return new DateTime(year, month, day, hours, minutes, 0);
         }
 
         public void DisplaySessions(List<CodingSession> sessions)
@@ -171,8 +171,8 @@ namespace CodingTracker
             {
                 table.AddRow(
                     session.Id.ToString(),
-                    session.StartTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                    session.EndTime.ToString("yyyy-MM-dd HH:mm:ss"),
+                    session.StartTime.ToString("yyyy-MM-dd HH:mm"),
+                    session.EndTime.ToString("yyyy-MM-dd HH:mm"),
                     session.GetFormattedDuration());
             }
 

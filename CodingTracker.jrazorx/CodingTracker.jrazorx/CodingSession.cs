@@ -13,7 +13,7 @@
 
         public string GetFormattedDuration()
         {
-            return GetDuration().ToString(@"hh\:mm\:ss");
+            return GetDuration().ToString(@"hh\:mm");
         }
     }
 }

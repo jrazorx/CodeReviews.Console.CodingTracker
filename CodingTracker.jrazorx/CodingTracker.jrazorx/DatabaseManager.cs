@@ -29,15 +29,26 @@ namespace CodingTracker
         public async Task InsertSessionAsync(CodingSession session)
         {
             using var connection = new SqliteConnection(_connectionString);
-            await connection.ExecuteAsync(
-                "INSERT INTO CodingSessions (StartTime, EndTime) VALUES (@StartTime, @EndTime)",
+            await connection.ExecuteAsync(@"
+                INSERT INTO CodingSessions (
+                    StartTime,
+                    EndTime)
+                VALUES (
+                    @StartTime,
+                    @EndTime
+                )",
                 new { session.StartTime, session.EndTime });
         }
 
         public async Task<List<CodingSession>> GetAllSessionsAsync()
         {
             using var connection = new SqliteConnection(_connectionString);
-            var sessions = await connection.QueryAsync<CodingSession>("SELECT * FROM CodingSessions");
+            var sessions = await connection.QueryAsync<CodingSession>(@"
+                 SELECT Id
+                        StartTime
+                        EndTime
+                   FROM CodingSessions
+            ");
             return sessions.AsList();
         }
     }
