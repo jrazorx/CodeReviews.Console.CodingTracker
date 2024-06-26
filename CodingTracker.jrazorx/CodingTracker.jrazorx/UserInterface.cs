@@ -1,4 +1,6 @@
 ﻿using Spectre.Console;
+using System.Linq;
+using System.Globalization;
 
 namespace CodingTracker
 {
@@ -25,6 +27,136 @@ namespace CodingTracker
         public string GetUserInput(string prompt)
         {
             return AnsiConsole.Ask<string>(prompt);
+        }
+
+        public int GetInteger(string prompt)
+        {
+            return AnsiConsole.Prompt(
+                new TextPrompt<int>(prompt)
+                    .PromptStyle("green")
+                    .ValidationErrorMessage("[red]Please enter a valid integer.[/]")
+                    .Validate(value =>
+                    {
+                        return value > 0 ? ValidationResult.Success() : ValidationResult.Error("Value must be greater than 0.");
+                    }));
+        }
+
+        public DateTime GetDateTime(string prompt)
+        {
+            var rule = new Rule("[blue]" + prompt + "[/]");
+            rule.LeftJustified();
+            AnsiConsole.Write(rule);
+
+            var today = DateTime.Now;
+
+            // Year selection
+            var year = AnsiConsole.Prompt(
+                new TextPrompt<int>("Enter the [green]year[/]: ")
+                    .DefaultValue(DateTime.Now.Year)
+                    .PromptStyle("yellow")
+                    .ValidationErrorMessage("[red]That's not a valid year[/]")
+                    .Validate(year =>
+                    {
+                        return year switch
+                        {
+                            <  0 => ValidationResult.Error("[red]The year must be at least 0[/]"),
+                            >= 9999 => ValidationResult.Error("[red]The year must be less than 9999[/]"),
+                            _ => ValidationResult.Success(),
+                        };
+                    })
+            );
+
+            // Month selection
+            var monthPrompt = new TextPrompt<int>("Enter the [green]month[/]: ")
+                .PromptStyle("yellow")
+                .ValidationErrorMessage("[red]That's not a valid month[/]")
+                .Validate(month =>
+                {
+                    return month switch
+                    {
+                        < 1 => ValidationResult.Error("[red]The month must be 1 or greater[/]"),
+                        > 12 => ValidationResult.Error("[red]The month must be 12 or less[/]"),
+                        _ => ValidationResult.Success(),
+                    };
+                });
+
+            // Add default value for month if year matches today's year
+            if (year == today.Year)
+            {
+                monthPrompt = monthPrompt.DefaultValue(today.Month);
+            }
+
+            var month = AnsiConsole.Prompt(monthPrompt);
+
+            // Day selection
+            var dayPrompt = new TextPrompt<int>("Enter the [green]day[/]: ")
+                .PromptStyle("yellow")
+                .ValidationErrorMessage("[red]That's not a valid day[/]")
+                .Validate(day =>
+                {
+                    int maxDays = DateTime.DaysInMonth(year, month);
+                    if (day < 1)
+                    {
+                        return ValidationResult.Error("[red]The day must be 1 or greater[/]");
+                    }
+                    else if (day > maxDays)
+                    {
+                        return ValidationResult.Error($"[red]The day must be {maxDays} or less for {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)} {year}[/]");
+                    }
+                    return ValidationResult.Success();
+                });
+
+            // Add default value for day if year and month match today's date
+            if (year == today.Year && month == today.Month)
+            {
+                dayPrompt = dayPrompt.DefaultValue(today.Day);
+            }
+
+            var day = AnsiConsole.Prompt(dayPrompt);
+
+            // Hour selection
+            var hourPrompt = new TextPrompt<int>("Enter the [green]hour[/] (0-23): ")
+                .PromptStyle("yellow")
+                .ValidationErrorMessage("[red]That's not a valid hour[/]")
+                .Validate(hour =>
+                {
+                    return hour switch
+                    {
+                        < 0 => ValidationResult.Error("[red]The hour must be 0 or greater[/]"),
+                        > 23 => ValidationResult.Error("[red]The hour must be 23 or less[/]"),
+                        _ => ValidationResult.Success(),
+                    };
+                });
+
+            if (year == today.Year && month == today.Month && day == today.Day)
+            {
+                hourPrompt = hourPrompt.DefaultValue(today.Hour);
+            }
+
+            var hour = AnsiConsole.Prompt(hourPrompt);
+
+            // Minute selection
+            var minutePrompt = new TextPrompt<int>("Enter the [green]minute[/] (0-59): ")
+                .PromptStyle("yellow")
+                .ValidationErrorMessage("[red]That's not a valid minute[/]")
+                .Validate(minute =>
+                {
+                    return minute switch
+                    {
+                        < 0 => ValidationResult.Error("[red]The minute must be 0 or greater[/]"),
+                        > 59 => ValidationResult.Error("[red]The minute must be 59 or less[/]"),
+                        _ => ValidationResult.Success(),
+                    };
+                });
+
+            if (year == today.Year && month == today.Month && day == today.Day && hour == today.Hour)
+            {
+                minutePrompt = minutePrompt.DefaultValue(today.Minute);
+            }
+
+            var minute = AnsiConsole.Prompt(minutePrompt);
+
+            return new DateTime(year, 1, 1, 0, 0, 0);
         }
 
         public void DisplaySessions(List<CodingSession> sessions)

@@ -1,4 +1,6 @@
-﻿namespace CodingTracker
+﻿using System.Diagnostics.Metrics;
+
+namespace CodingTracker
 {
     public enum MenuOption
     {
@@ -79,28 +81,19 @@
 
         private async Task AddNewSessionAsync()
         {
-            Console.Clear();
             DateTime startTime, endTime;
 
             while (true)
             {
-                var startTimeInput = _userInterface.GetUserInput("Enter start time (yyyy-MM-dd HH:mm:ss): ");
-                if (!_inputValidator.TryParseDateTime(startTimeInput, out startTime))
-                {
-                    _userInterface.DisplayError("Invalid date/time format. Please try again.");
-                    continue;
-                }
+                Console.Clear();
+                startTime = _userInterface.GetDateTime("Enter start time");
 
-                var endTimeInput = _userInterface.GetUserInput("Enter end time (yyyy-MM-dd HH:mm:ss): ");
-                if (!_inputValidator.TryParseDateTime(endTimeInput, out endTime))
-                {
-                    _userInterface.DisplayError("Invalid date/time format. Please try again.");
-                    continue;
-                }
+                endTime = _userInterface.GetDateTime("Enter end time");
 
                 if (!_inputValidator.ValidateTimeRange(startTime, endTime))
                 {
                     _userInterface.DisplayError("End time must be after start time. Please try again.");
+                    _userInterface.WaitForKeyPress();
                     continue;
                 }
 
