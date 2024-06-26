@@ -44,8 +44,8 @@ namespace CodingTracker
         {
             using var connection = new SqliteConnection(_connectionString);
             var sessions = await connection.QueryAsync<CodingSession>(@"
-                 SELECT Id
-                        StartTime
+                 SELECT Id,
+                        StartTime,
                         EndTime
                    FROM CodingSessions
             ");

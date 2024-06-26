@@ -158,6 +158,8 @@ namespace CodingTracker
 
         public void DisplaySessions(List<CodingSession> sessions)
         {
+            DisplayTitle("List of all sessions");
+
             var table = new Table();
             table.AddColumn("ID");
             table.AddColumn("Start Time");
