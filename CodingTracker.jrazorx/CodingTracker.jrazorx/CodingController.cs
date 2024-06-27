@@ -44,7 +44,7 @@ namespace CodingTracker
                         await ViewAllSessionsAsync();
                         break;
                     case MenuOption.UpdateSession:
-                        //await UpdateSessionAsync();
+                        await UpdateSessionAsync();
                         break;
                     case MenuOption.DeleteSession:
                         //await DeleteSessionAsync();
@@ -120,6 +120,50 @@ namespace CodingTracker
 
             var sessions = await _databaseManager.GetAllSessionsAsync();
             _userInterface.DisplaySessions(sessions);
+        }
+
+        private async Task UpdateSessionAsync()
+        {
+            await ViewAllSessionsAsync();
+
+            _userInterface.DisplayTitle("Update a session");
+            int sessionId = _userInterface.GetInteger("Enter the ID of the session you want to update:");
+            var sessions = await _databaseManager.GetAllSessionsAsync();
+            var sessionToUpdate = sessions.FirstOrDefault(s => s.Id == sessionId);
+
+            if (sessionToUpdate == null)
+            {
+                _userInterface.DisplayError("Session not found.");
+                return;
+            }
+
+            DateTime startTime, endTime;
+
+            while (true)
+            {
+                startTime = _userInterface.GetDateTime("Enter new start time", sessionToUpdate.StartTime);
+                endTime = _userInterface.GetDateTime("Enter new end time", sessionToUpdate.EndTime);
+
+                if (!_inputValidator.IsSessionTimeRangeValid(startTime, endTime))
+                {
+                    _userInterface.DisplayError("End time must be after start time. Please try again.");
+                    continue;
+                }
+
+                if (!_inputValidator.IsSessionDurationValid(startTime, endTime))
+                {
+                    _userInterface.DisplayError("Session duration cannot exceed 23 hours and 59 minutes. Please try again.");
+                    continue;
+                }
+
+                break;
+            }
+
+            sessionToUpdate.StartTime = startTime;
+            sessionToUpdate.EndTime = endTime;
+
+            await _databaseManager.UpdateSessionAsync(sessionToUpdate);
+            _userInterface.DisplayMessage("Session updated successfully.");
         }
     }
 }

@@ -51,5 +51,16 @@ namespace CodingTracker
             ");
             return sessions.AsList();
         }
+
+        public async Task UpdateSessionAsync(CodingSession session)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.ExecuteAsync(@"
+                 UPDATE CodingSessions
+                    SET StartTime = @StartTime,
+                        EndTime = @EndTime
+                  WHERE Id = @Id",
+                        new { session.StartTime, session.EndTime, session.Id });
+        }
     }
 }
