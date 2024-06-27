@@ -2,16 +2,6 @@
 
 namespace CodingTracker
 {
-    public enum MenuOption
-    {
-        Exit = 0,
-        AddNewSession,
-        ViewAllSessions,
-        UpdateSession,
-        DeleteSession,
-        ViewStatistics
-    }
-
     public class CodingController
     {
         private readonly DatabaseManager _databaseManager;
@@ -31,9 +21,7 @@ namespace CodingTracker
 
             while (!exitRequested)
             {
-                _userInterface.DisplayMenu();
-
-                MenuOption menuChoice = GetValidMenuChoice();
+                MenuOption menuChoice = _userInterface.GetMenuChoice();
 
                 switch (menuChoice)
                 {
@@ -61,21 +49,6 @@ namespace CodingTracker
                 {
                     _userInterface.WaitForKeyPress();
                 }
-            }
-        }
-
-        private MenuOption GetValidMenuChoice()
-        {
-            MenuOption choice;
-            while (true)
-            {
-                Console.Write("\nEnter your choice: ");
-                if (Enum.TryParse(Console.ReadLine(), true, out choice) &&
-                    Enum.IsDefined(typeof(MenuOption), choice))
-                {
-                    return choice;
-                }
-                Console.WriteLine("Invalid input. Please enter a number between 0 and 5.");
             }
         }
 

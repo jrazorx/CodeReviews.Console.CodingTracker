@@ -4,24 +4,35 @@ using System.Globalization;
 
 namespace CodingTracker
 {
+    public enum MenuOption
+    {
+        AddNewSession = 1,
+        ViewAllSessions,
+        UpdateSession,
+        DeleteSession,
+        ViewStatistics,
+        Exit
+    }
+
     public class UserInterface
     {
-        public void DisplayMenu()
+        public MenuOption GetMenuChoice()
         {
             AnsiConsole.Clear();
+
             AnsiConsole.Write(
                 new FigletText("Coding Tracker")
                     .Centered()
                     .Color(Color.Aqua));
 
-            AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine("1. Add new coding session");
-            AnsiConsole.WriteLine("2. View all coding sessions");
-            AnsiConsole.WriteLine("3. Update coding session");
-            AnsiConsole.WriteLine("4. Delete coding session");
-            AnsiConsole.WriteLine("5. View coding statistics");
-            AnsiConsole.WriteLine("0. Exit");
-            AnsiConsole.WriteLine();
+            var choice = AnsiConsole.Prompt(
+                new SelectionPrompt<MenuOption>()
+                    .Title("[green]MAIN MENU[/]")
+                    .PageSize(6)
+                    .AddChoices(Enum.GetValues(typeof(MenuOption)).Cast<MenuOption>())
+            );
+
+            return choice;
         }
 
         public bool GetConfirmation(string prompt)
