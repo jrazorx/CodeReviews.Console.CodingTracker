@@ -113,22 +113,37 @@ namespace CodingTracker
             _userInterface.DisplayMessage("Coding session added successfully.");
         }
 
-        private async Task ViewAllSessionsAsync(bool clearConsoleAtStart = true)
+        private async Task<List<CodingSession>> FetchSessionsAsync()
+        {
+            return await _databaseManager.GetAllSessionsAsync();
+        }
+
+        private void DisplaySessions(List<CodingSession> sessions, bool clearConsoleAtStart = true)
         {
             if (clearConsoleAtStart)
                 Console.Clear();
-
-            var sessions = await _databaseManager.GetAllSessionsAsync();
             _userInterface.DisplaySessions(sessions);
+        }
+
+        private async Task<List<CodingSession>> FetchAndDisplaySessionsAsync(bool clearConsoleAtStart = true)
+        {
+            var sessions = await FetchSessionsAsync();
+            DisplaySessions(sessions, clearConsoleAtStart);
+            return sessions;
+        }
+
+
+        private async Task ViewAllSessionsAsync(bool clearConsoleAtStart = true)
+        {
+            await FetchAndDisplaySessionsAsync(clearConsoleAtStart);
         }
 
         private async Task UpdateSessionAsync()
         {
-            await ViewAllSessionsAsync();
+            var sessions = await FetchAndDisplaySessionsAsync();
 
             _userInterface.DisplayTitle("Update a session");
             int sessionId = _userInterface.GetInteger("Enter the ID of the session you want to update:");
-            var sessions = await _databaseManager.GetAllSessionsAsync();
             var sessionToUpdate = sessions.FirstOrDefault(s => s.Id == sessionId);
 
             if (sessionToUpdate == null)
