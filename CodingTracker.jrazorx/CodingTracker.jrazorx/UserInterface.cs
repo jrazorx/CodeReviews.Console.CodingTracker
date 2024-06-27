@@ -37,7 +37,7 @@ namespace CodingTracker
                     .ValidationErrorMessage("[red]Please enter a valid integer.[/]")
                     .Validate(value =>
                     {
-                        return value > 0 ? ValidationResult.Success() : ValidationResult.Error("Value must be greater than 0.");
+                        return value > 0 ? ValidationResult.Success() : ValidationResult.Error("[red]Value must be greater than 0.[/]");
                     }));
         }
 
