@@ -41,16 +41,16 @@ namespace CodingTracker
                     }));
         }
 
-        public DateTime GetDateTime(string prompt)
+        public DateTime GetDateTime(string prompt, DateTime? defaultDateTime = null)
         {
             DisplayTitle(prompt);
 
-            var now = DateTime.Now;
+            var referenceDateTime = defaultDateTime ?? DateTime.Now;
 
             // Year selection
             var year = AnsiConsole.Prompt(
                 new TextPrompt<int>("Enter the [green]year[/] [blue][[0-9999]][/] ")
-                    .DefaultValue(now.Year)
+                    .DefaultValue(referenceDateTime.Year)
                     .PromptStyle("yellow")
                     .ValidationErrorMessage("[red]That's not a valid year[/]")
                     .Validate(year =>
@@ -78,9 +78,9 @@ namespace CodingTracker
                     };
                 });
 
-            if (year == now.Year)
+            if (year == referenceDateTime.Year)
             {
-                monthPrompt = monthPrompt.DefaultValue(now.Month);
+                monthPrompt = monthPrompt.DefaultValue(referenceDateTime.Month);
             }
 
             var month = AnsiConsole.Prompt(monthPrompt);
@@ -103,9 +103,9 @@ namespace CodingTracker
                     return ValidationResult.Success();
                 });
 
-            if (year == now.Year && month == now.Month)
+            if (year == referenceDateTime.Year && month == referenceDateTime.Month)
             {
-                dayPrompt = dayPrompt.DefaultValue(now.Day);
+                dayPrompt = dayPrompt.DefaultValue(referenceDateTime.Day);
             }
 
             var day = AnsiConsole.Prompt(dayPrompt);
@@ -124,9 +124,9 @@ namespace CodingTracker
                     };
                 });
 
-            if (year == now.Year && month == now.Month && day == now.Day)
+            if (year == referenceDateTime.Year && month == referenceDateTime.Month && day == referenceDateTime.Day)
             {
-                hoursPrompt = hoursPrompt.DefaultValue(now.Hour);
+                hoursPrompt = hoursPrompt.DefaultValue(referenceDateTime.Hour);
             }
 
             var hours = AnsiConsole.Prompt(hoursPrompt);
@@ -145,9 +145,9 @@ namespace CodingTracker
                     };
                 });
 
-            if (year == now.Year && month == now.Month && day == now.Day && hours == now.Hour)
+            if (year == referenceDateTime.Year && month == referenceDateTime.Month && day == referenceDateTime.Day && hours == referenceDateTime.Hour)
             {
-                minutesPrompt = minutesPrompt.DefaultValue(now.Minute);
+                minutesPrompt = minutesPrompt.DefaultValue(referenceDateTime.Minute);
             }
 
             var minutes = AnsiConsole.Prompt(minutesPrompt);
