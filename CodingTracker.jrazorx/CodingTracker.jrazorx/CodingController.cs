@@ -90,9 +90,16 @@ namespace CodingTracker
 
                 endTime = _userInterface.GetDateTime("Enter end time");
 
-                if (!_inputValidator.ValidateTimeRange(startTime, endTime))
+                if (!_inputValidator.IsSessionTimeRangeValid(startTime, endTime))
                 {
                     _userInterface.DisplayError("End time must be after start time. Please try again.");
+                    _userInterface.WaitForKeyPress();
+                    continue;
+                }
+
+                if (!_inputValidator.IsSessionDurationValid(startTime, endTime))
+                {
+                    _userInterface.DisplayError("Get some sleep! Session duration cannot exceed 23 hours and 59 minutes. Please try again.");
                     _userInterface.WaitForKeyPress();
                     continue;
                 }
