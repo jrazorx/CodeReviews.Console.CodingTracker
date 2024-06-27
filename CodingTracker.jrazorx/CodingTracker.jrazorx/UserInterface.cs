@@ -49,7 +49,7 @@ namespace CodingTracker
 
             // Year selection
             var year = AnsiConsole.Prompt(
-                new TextPrompt<int>("Enter the [green]year[/]: ")
+                new TextPrompt<int>("Enter the [green]year[/] [blue][[0-9999]][/] ")
                     .DefaultValue(now.Year)
                     .PromptStyle("yellow")
                     .ValidationErrorMessage("[red]That's not a valid year[/]")
@@ -58,14 +58,14 @@ namespace CodingTracker
                         return year switch
                         {
                             < 0 => ValidationResult.Error("[red]The year must be at least 0[/]"),
-                            >= 9999 => ValidationResult.Error("[red]The year must be less than 9999[/]"),
+                            > 9999 => ValidationResult.Error("[red]The year must be less than or equal to 9999[/]"),
                             _ => ValidationResult.Success(),
                         };
                     })
             );
 
             // Month selection
-            var monthPrompt = new TextPrompt<int>("Enter the [green]month[/]: ")
+            var monthPrompt = new TextPrompt<int>("Enter the [green]month[/] [blue][[1-12]][/] ")
                 .PromptStyle("yellow")
                 .ValidationErrorMessage("[red]That's not a valid month[/]")
                 .Validate(month =>
@@ -86,12 +86,12 @@ namespace CodingTracker
             var month = AnsiConsole.Prompt(monthPrompt);
 
             // Day selection
-            var dayPrompt = new TextPrompt<int>("Enter the [green]day[/]: ")
+            int maxDays = DateTime.DaysInMonth(year, month);
+            var dayPrompt = new TextPrompt<int>($"Enter the [green]day[/] [blue][[1-{maxDays}]][/] ")
                 .PromptStyle("yellow")
                 .ValidationErrorMessage("[red]That's not a valid day[/]")
                 .Validate(day =>
                 {
-                    int maxDays = DateTime.DaysInMonth(year, month);
                     if (day < 1)
                     {
                         return ValidationResult.Error("[red]The day must be 1 or greater[/]");
@@ -111,7 +111,7 @@ namespace CodingTracker
             var day = AnsiConsole.Prompt(dayPrompt);
 
             // Hours selection
-            var hoursPrompt = new TextPrompt<int>("Enter the [green]hour[/] (0-23): ")
+            var hoursPrompt = new TextPrompt<int>("Enter the [green]hour[/] [blue][[0-23]][/] ")
                 .PromptStyle("yellow")
                 .ValidationErrorMessage("[red]That's not a valid hour[/]")
                 .Validate(hours =>
@@ -132,7 +132,7 @@ namespace CodingTracker
             var hours = AnsiConsole.Prompt(hoursPrompt);
 
             // Minutes selection
-            var minutesPrompt = new TextPrompt<int>("Enter the [green]minute[/] (0-59): ")
+            var minutesPrompt = new TextPrompt<int>("Enter the [green]minute[/] [blue][[0-59]][/] ")
                 .PromptStyle("yellow")
                 .ValidationErrorMessage("[red]That's not a valid minute[/]")
                 .Validate(minutes =>
