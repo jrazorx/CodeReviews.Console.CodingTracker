@@ -62,5 +62,14 @@ namespace CodingTracker
                   WHERE Id = @Id",
                         new { session.StartTime, session.EndTime, session.Id });
         }
+
+        public async Task DeleteSessionAsync(int id)
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            await connection.ExecuteAsync(@"
+                 DELETE FROM CodingSessions
+                  WHERE Id = @Id",
+                        new { Id = id });
+        }
     }
 }

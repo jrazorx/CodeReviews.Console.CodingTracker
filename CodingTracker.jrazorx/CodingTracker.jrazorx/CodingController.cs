@@ -47,7 +47,7 @@ namespace CodingTracker
                         await UpdateSessionAsync();
                         break;
                     case MenuOption.DeleteSession:
-                        //await DeleteSessionAsync();
+                        await DeleteSessionAsync();
                         break;
                     case MenuOption.ViewStatistics:
                         //await ViewStatisticsAsync();
@@ -179,6 +179,33 @@ namespace CodingTracker
 
             await _databaseManager.UpdateSessionAsync(sessionToUpdate);
             _userInterface.DisplayMessage("Session updated successfully.");
+        }
+
+        private async Task DeleteSessionAsync()
+        {
+            var sessions = await FetchAndDisplaySessionsAsync();
+
+            _userInterface.DisplayTitle("Delete a session");
+            int sessionId = _userInterface.GetInteger("Enter the ID of the session you want to delete:");
+            var sessionToDelete = sessions.FirstOrDefault(s => s.Id == sessionId);
+
+            if (sessionToDelete == null)
+            {
+                _userInterface.DisplayError("Session not found.");
+                return;
+            }
+
+            bool confirmDelete = _userInterface.GetConfirmation($"Are you sure you want to delete the session from [green]{sessionToDelete.StartTime}[/] to [green]{sessionToDelete.EndTime}[/]?");
+
+            if (confirmDelete)
+            {
+                await _databaseManager.DeleteSessionAsync(sessionId);
+                _userInterface.DisplayMessage("Session deleted successfully.");
+            }
+            else
+            {
+                _userInterface.DisplayMessage("Deletion cancelled.");
+            }
         }
     }
 }

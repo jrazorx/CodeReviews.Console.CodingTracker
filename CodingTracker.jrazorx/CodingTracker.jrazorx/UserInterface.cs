@@ -24,6 +24,11 @@ namespace CodingTracker
             AnsiConsole.WriteLine();
         }
 
+        public bool GetConfirmation(string prompt)
+        {
+            return AnsiConsole.Confirm(prompt);
+        }
+
         public string GetUserInput(string prompt)
         {
             return AnsiConsole.Ask<string>(prompt);
