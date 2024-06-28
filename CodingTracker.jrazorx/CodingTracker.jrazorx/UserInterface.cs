@@ -4,16 +4,6 @@ using System.Globalization;
 
 namespace CodingTracker
 {
-    public enum MenuOption
-    {
-        AddNewSession = 1,
-        ViewAllSessions,
-        UpdateSession,
-        DeleteSession,
-        ViewStatistics,
-        Exit
-    }
-
     public class UserInterface
     {
         public MenuOption GetMenuChoice()
@@ -29,7 +19,8 @@ namespace CodingTracker
                 new SelectionPrompt<MenuOption>()
                     .Title("[green]MAIN MENU[/]")
                     .PageSize(6)
-                    .AddChoices(Enum.GetValues(typeof(MenuOption)).Cast<MenuOption>())
+                    .AddChoices(Enum.GetValues<MenuOption>())
+                    .UseConverter(option => option.GetDisplayText())
             );
 
             return choice;
