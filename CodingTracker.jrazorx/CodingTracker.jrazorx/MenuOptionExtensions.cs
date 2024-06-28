@@ -4,6 +4,7 @@
     {
         private static readonly Dictionary<MenuOption, string> DisplayTexts = new()
     {
+        { MenuOption.StartLiveSession, "Start a live session" },
         { MenuOption.AddNewSession, "Add a new session" },
         { MenuOption.ViewAllSessions, "View all sessions" },
         { MenuOption.UpdateSession, "Update a session" },

@@ -1,6 +1,7 @@
 ﻿using Spectre.Console;
 using System.Linq;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace CodingTracker
 {
@@ -18,7 +19,7 @@ namespace CodingTracker
             var choice = AnsiConsole.Prompt(
                 new SelectionPrompt<MenuOption>()
                     .Title("[green]MAIN MENU[/]")
-                    .PageSize(6)
+                    .PageSize(10)
                     .AddChoices(Enum.GetValues<MenuOption>())
                     .UseConverter(option => option.GetDisplayText())
             );
@@ -187,7 +188,7 @@ namespace CodingTracker
 
         public void DisplayMessage(string message)
         {
-            AnsiConsole.WriteLine(message);
+            AnsiConsole.MarkupLine(message);
         }
 
         public void DisplayError(string message)
@@ -208,5 +209,32 @@ namespace CodingTracker
             Console.ReadKey(true);
         }
 
+        public void DisplayLiveSessionStopwatch(Stopwatch stopwatch)
+        {
+            AnsiConsole.Clear();
+            AnsiConsole.Write(new FigletText("Coding Timer").Centered().Color(Color.Aqua));
+            AnsiConsole.WriteLine();
+
+            AnsiConsole.Live(CreateStopwatchPanel(stopwatch))
+                .Start(ctx =>
+                {
+                    while (!Console.KeyAvailable)
+                    {
+                        ctx.UpdateTarget(CreateStopwatchPanel(stopwatch));
+                        Thread.Sleep(100);
+                    }
+                });
+        }
+
+        private Panel CreateStopwatchPanel(Stopwatch stopwatch)
+        {
+            var elapsed = stopwatch.Elapsed;
+            var timeString = $"{elapsed.Hours:D2}:{elapsed.Minutes:D2}:{elapsed.Seconds:D2}";
+
+            return new Panel(new Markup($"[bold green]{timeString}[/]\n\n[yellow]Press any key to stop the timer[/]"))
+                .Header("Elapsed Time")
+                .Expand()
+                .BorderColor(Color.Blue);
+        }
     }
 }

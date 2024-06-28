@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Metrics;
+﻿using System.Diagnostics;
+using System.Diagnostics.Metrics;
 
 namespace CodingTracker
 {
@@ -7,12 +8,14 @@ namespace CodingTracker
         private readonly DatabaseManager _databaseManager;
         private readonly UserInterface _userInterface;
         private readonly InputValidator _inputValidator;
+        private readonly Stopwatch _stopwatch;
 
         public CodingController(DatabaseManager databaseManager, UserInterface userInterface, InputValidator inputValidator)
         {
             _databaseManager = databaseManager;
             _userInterface = userInterface;
             _inputValidator = inputValidator;
+            _stopwatch = new Stopwatch();
         }
 
         public async Task RunAsync()
@@ -25,6 +28,9 @@ namespace CodingTracker
 
                 switch (menuChoice)
                 {
+                    case MenuOption.StartLiveSession:
+                        await StartLiveSessionAsync();
+                        break;
                     case MenuOption.AddNewSession:
                         await AddNewSessionAsync();
                         break;
@@ -50,6 +56,34 @@ namespace CodingTracker
                     _userInterface.WaitForKeyPress();
                 }
             }
+        }
+
+        private async Task StartLiveSessionAsync()
+        {
+            _userInterface.DisplayMessage("Stopwatch session started. Press any key to stop.");
+            DateTime startTime = DateTime.Now;
+            _stopwatch.Start();
+
+            _userInterface.DisplayLiveSessionStopwatch(_stopwatch);
+
+            Console.ReadKey(true);
+
+            _stopwatch.Stop();
+            DateTime endTime = DateTime.Now;
+
+            TimeSpan duration = _stopwatch.Elapsed;
+            _userInterface.DisplayMessage($"Session ended. Duration: {duration.ToString(@"hh\:mm\:ss")}");
+
+            if (duration.TotalMinutes >= 1)
+            {
+                var session = new CodingSession { StartTime = startTime, EndTime = endTime };
+                await _databaseManager.InsertSessionAsync(session);
+                _userInterface.DisplayMessage("Coding session [green]added successfully.[/]"); 
+            }
+            else
+                _userInterface.DisplayMessage("Coding session [red]not recorded.[/] Minimum duration is 1 minute.");
+
+            _stopwatch.Reset();
         }
 
         private async Task AddNewSessionAsync()

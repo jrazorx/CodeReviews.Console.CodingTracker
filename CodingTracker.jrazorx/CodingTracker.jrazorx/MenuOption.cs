@@ -2,7 +2,8 @@
 {
     public enum MenuOption
     {
-        AddNewSession = 1,
+        StartLiveSession,
+        AddNewSession,
         ViewAllSessions,
         UpdateSession,
         DeleteSession,
