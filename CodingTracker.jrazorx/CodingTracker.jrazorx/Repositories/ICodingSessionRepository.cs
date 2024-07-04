@@ -6,7 +6,7 @@ namespace CodingTracker.jrazorx.Repositories
     {
         Task InitializeDatabaseAsync();
         Task InsertSessionAsync(CodingSession session);
-        Task<List<CodingSession>> GetAllSessionsAsync();
+        Task<List<CodingSession>> GetSessionsAsync(DateTime? startDate, DateTime? endDate, bool ascending = true);
         Task UpdateSessionAsync(CodingSession session);
         Task DeleteSessionAsync(int id);
     }

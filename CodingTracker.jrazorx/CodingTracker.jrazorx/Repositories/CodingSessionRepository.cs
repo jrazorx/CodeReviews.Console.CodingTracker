@@ -41,15 +41,19 @@ namespace CodingTracker.jrazorx.Repositories
                 new { session.StartTime, session.EndTime });
         }
 
-        public async Task<List<CodingSession>> GetAllSessionsAsync()
+        public async Task<List<CodingSession>> GetSessionsAsync(DateTime? startDate, DateTime? endDate, bool ascending = true)
         {
             using var connection = new SqliteConnection(_connectionString);
-            var sessions = await connection.QueryAsync<CodingSession>(@"
-                 SELECT Id,
-                        StartTime,
-                        EndTime
-                   FROM CodingSessions
-            ");
+            var query = @"
+               SELECT Id, StartTime, EndTime
+                 FROM CodingSessions
+                WHERE (@StartDate IS NULL
+                   OR  StartTime >= @StartDate)
+                  AND (@EndDate IS NULL
+                   OR  EndTime <= @EndDate)
+               ORDER BY Id " + (ascending ? "ASC" : "DESC");
+
+            var sessions = await connection.QueryAsync<CodingSession>(query, new { StartDate = startDate, EndDate = endDate });
             return sessions.AsList();
         }
 
