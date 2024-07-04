@@ -124,9 +124,13 @@ namespace CodingTracker.jrazorx.Controllers
             _userInterface.DisplayMessage("Coding session added successfully.");
         }
 
-        private async Task<List<CodingSession>> FetchSessionsAsync()
+        private async Task<List<CodingSession>> FetchSessionsAsync(string period = "all", bool ascending = true)
         {
-            return await _sessionService.GetAllSessionsAsync();
+            if (period.ToLower() == "all")
+            {
+                return await _sessionService.GetSessionsAsync(null, null, ascending);
+            }
+            return await _sessionService.GetSessionsByPeriodAsync(period, ascending);
         }
 
         private void DisplaySessions(List<CodingSession> sessions, bool clearConsoleAtStart = true)
@@ -144,9 +148,31 @@ namespace CodingTracker.jrazorx.Controllers
         }
 
 
-        private async Task ViewAllSessionsAsync(bool clearConsoleAtStart = true)
+        private async Task ViewAllSessionsAsync()
         {
-            await FetchAndDisplaySessionsAsync(clearConsoleAtStart);
+            string period = "all";
+            bool ascending = true;
+            bool exit = false;
+
+            while (!exit)
+            {
+                var sessions = await FetchSessionsAsync(period, ascending);
+                _userInterface.DisplaySessions(sessions);
+
+                var choice = _userInterface.GetSessionViewMenuChoice();
+                switch (choice)
+                {
+                    case SessionViewOption.ChangeFilter:
+                        period = _userInterface.GetFilterPeriod();
+                        break;
+                    case SessionViewOption.ChangeSortOrder:
+                        ascending = _userInterface.GetSortOrder();
+                        break;
+                    case SessionViewOption.Back:
+                        exit = true;
+                        break;
+                }
+            }
         }
 
         private async Task UpdateSessionAsync()

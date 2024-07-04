@@ -185,6 +185,35 @@ namespace CodingTracker.jrazorx.UI
             }
 
             AnsiConsole.Write(table);
+
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine("Use the menu below to filter or sort the sessions.");
+        }
+
+        public SessionViewOption GetSessionViewMenuChoice()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<SessionViewOption>()
+                    .Title("Select an option:")
+                    .AddChoices(Enum.GetValues(typeof(SessionViewOption)).Cast<SessionViewOption>())
+                    .UseConverter(o => o.GetDisplayText()));
+        }
+
+        public string GetFilterPeriod()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Select the period to filter:")
+                    .AddChoices(new[] { "All", "Week", "Month", "Year" }));
+        }
+
+        public bool GetSortOrder()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<bool>()
+                    .Title("Select the sort order:")
+                    .AddChoices(new[] { true, false })
+                    .UseConverter(b => b ? "Ascending" : "Descending"));
         }
 
         public void DisplayMessage(string message)

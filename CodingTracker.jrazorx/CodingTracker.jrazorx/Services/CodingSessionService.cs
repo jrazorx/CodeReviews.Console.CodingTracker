@@ -22,9 +22,32 @@ namespace CodingTracker.jrazorx.Services
             await _repository.InsertSessionAsync(session);
         }
 
-        public async Task<List<CodingSession>> GetAllSessionsAsync()
+        public async Task<List<CodingSession>> GetSessionsAsync(DateTime? startDate, DateTime? endDate, bool ascending = true)
         {
-            return await _repository.GetAllSessionsAsync();
+            return await _repository.GetSessionsAsync(startDate, endDate, ascending);
+        }
+
+        public async Task<List<CodingSession>> GetSessionsByPeriodAsync(string period, bool ascending = true)
+        {
+            DateTime startDate = DateTime.Now;
+            DateTime endDate = DateTime.Now;
+
+            switch (period.ToLower())
+            {
+                case "week":
+                    startDate = DateTime.Now.AddDays(-7);
+                    break;
+                case "month":
+                    startDate = DateTime.Now.AddMonths(-1);
+                    break;
+                case "year":
+                    startDate = DateTime.Now.AddYears(-1);
+                    break;
+                default:
+                    return await GetSessionsAsync(null, null, ascending);
+            }
+
+            return await GetSessionsAsync(startDate, endDate, ascending);
         }
 
         public async Task UpdateSessionAsync(CodingSession session)
