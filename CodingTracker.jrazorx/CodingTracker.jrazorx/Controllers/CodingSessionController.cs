@@ -1,18 +1,22 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.Metrics;
+using CodingTracker.jrazorx.Models;
+using CodingTracker.jrazorx.Services;
+using CodingTracker.jrazorx.UI;
+using CodingTracker.jrazorx.Helpers;
+using CodingTracker.jrazorx.Enums;
 
-namespace CodingTracker
+namespace CodingTracker.jrazorx.Controllers
 {
-    public class CodingController
+    public class CodingSessionController
     {
-        private readonly DatabaseManager _databaseManager;
+        private readonly CodingSessionService _sessionService;
         private readonly UserInterface _userInterface;
         private readonly InputValidator _inputValidator;
         private readonly Stopwatch _stopwatch;
 
-        public CodingController(DatabaseManager databaseManager, UserInterface userInterface, InputValidator inputValidator)
+        public CodingSessionController(CodingSessionService sessionService, UserInterface userInterface, InputValidator inputValidator)
         {
-            _databaseManager = databaseManager;
+            _sessionService = sessionService;
             _userInterface = userInterface;
             _inputValidator = inputValidator;
             _stopwatch = new Stopwatch();
@@ -77,8 +81,8 @@ namespace CodingTracker
             if (duration.TotalMinutes >= 1)
             {
                 var session = new CodingSession { StartTime = startTime, EndTime = endTime };
-                await _databaseManager.InsertSessionAsync(session);
-                _userInterface.DisplayMessage("Coding session [green]added successfully.[/]"); 
+                await _sessionService.InsertSessionAsync(session);
+                _userInterface.DisplayMessage("Coding session [green]added successfully.[/]");
             }
             else
                 _userInterface.DisplayMessage("Coding session [red]not recorded.[/] Minimum duration is 1 minute.");
@@ -116,13 +120,13 @@ namespace CodingTracker
 
             var session = new CodingSession { StartTime = startTime, EndTime = endTime };
 
-            await _databaseManager.InsertSessionAsync(session);
+            await _sessionService.InsertSessionAsync(session);
             _userInterface.DisplayMessage("Coding session added successfully.");
         }
 
         private async Task<List<CodingSession>> FetchSessionsAsync()
         {
-            return await _databaseManager.GetAllSessionsAsync();
+            return await _sessionService.GetAllSessionsAsync();
         }
 
         private void DisplaySessions(List<CodingSession> sessions, bool clearConsoleAtStart = true)
@@ -184,7 +188,7 @@ namespace CodingTracker
             sessionToUpdate.StartTime = startTime;
             sessionToUpdate.EndTime = endTime;
 
-            await _databaseManager.UpdateSessionAsync(sessionToUpdate);
+            await _sessionService.UpdateSessionAsync(sessionToUpdate);
             _userInterface.DisplayMessage("Session updated successfully.");
         }
 
@@ -206,7 +210,7 @@ namespace CodingTracker
 
             if (confirmDelete)
             {
-                await _databaseManager.DeleteSessionAsync(sessionId);
+                await _sessionService.DeleteSessionAsync(sessionId);
                 _userInterface.DisplayMessage("Session deleted successfully.");
             }
             else

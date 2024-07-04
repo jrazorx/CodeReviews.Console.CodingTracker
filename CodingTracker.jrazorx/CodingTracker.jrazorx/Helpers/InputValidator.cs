@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace CodingTracker
+namespace CodingTracker.jrazorx.Helpers
 {
     public class InputValidator
     {

@@ -1,4 +1,4 @@
-﻿namespace CodingTracker
+﻿namespace CodingTracker.jrazorx.Models
 {
     public class CodingSession
     {

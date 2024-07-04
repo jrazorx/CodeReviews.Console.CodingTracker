@@ -1,14 +1,15 @@
 ﻿using System.Configuration;
+using CodingTracker.jrazorx.Models;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace CodingTracker
+namespace CodingTracker.jrazorx.Repositories
 {
-    public class DatabaseManager
+    public class CodingSessionRepository : ICodingSessionRepository
     {
         private readonly string _connectionString;
 
-        public DatabaseManager()
+        public CodingSessionRepository()
         {
             _connectionString = ConfigurationManager.ConnectionStrings["CodingTrackerDB"].ConnectionString;
         }

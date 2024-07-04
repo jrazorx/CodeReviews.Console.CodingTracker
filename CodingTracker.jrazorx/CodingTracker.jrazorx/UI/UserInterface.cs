@@ -1,9 +1,10 @@
 ﻿using Spectre.Console;
-using System.Linq;
 using System.Globalization;
 using System.Diagnostics;
+using CodingTracker.jrazorx.Models;
+using CodingTracker.jrazorx.Enums;
 
-namespace CodingTracker
+namespace CodingTracker.jrazorx.UI
 {
     public class UserInterface
     {
