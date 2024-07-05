@@ -187,13 +187,13 @@ namespace CodingTracker.jrazorx.UI
             }
 
             AnsiConsole.Write(table);
-
-            AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine("Use the menu below to filter or sort the sessions.");
         }
 
         public SessionViewOption GetSessionViewMenuChoice()
         {
+            AnsiConsole.WriteLine();
+            AnsiConsole.WriteLine("Use the menu below to filter or sort the sessions.");
+
             return AnsiConsole.Prompt(
                 new SelectionPrompt<SessionViewOption>()
                     .Title("Select an option:")
@@ -267,6 +267,35 @@ namespace CodingTracker.jrazorx.UI
                 .Header("Elapsed Time")
                 .Expand()
                 .BorderColor(Color.Blue);
+        }
+
+        public string GetReportPeriod()
+        {
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Select the period for the report:")
+                    .AddChoices(new[] { "Week", "Month", "Year", "All Time" }));
+        }
+
+        public void DisplayReport((TimeSpan TotalTime, TimeSpan AverageTime, int SessionCount) report, string period)
+        {
+            AnsiConsole.Clear();
+            DisplayTitle($"Coding Report for {period}");
+
+            var table = new Table();
+            table.AddColumn("Metric");
+            table.AddColumn("Value");
+
+            table.AddRow("Total Coding Time", FormatTimeSpan(report.TotalTime));
+            table.AddRow("Average Session Time", FormatTimeSpan(report.AverageTime));
+            table.AddRow("Number of Sessions", report.SessionCount.ToString());
+
+            AnsiConsole.Write(table);
+        }
+
+        private string FormatTimeSpan(TimeSpan time)
+        {
+            return $"{(int)time.TotalHours:D2}:{time.Minutes:D2}:{time.Seconds:D2}";
         }
     }
 }

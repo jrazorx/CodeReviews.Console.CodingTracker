@@ -47,8 +47,8 @@ namespace CodingTracker.jrazorx.Controllers
                     case MenuOption.DeleteSession:
                         await DeleteSessionAsync();
                         break;
-                    case MenuOption.ViewStatistics:
-                        //await ViewStatisticsAsync();
+                    case MenuOption.ViewReports:
+                        await ViewReportsAsync();
                         break;
                     case MenuOption.Exit:
                         exitRequested = true;
@@ -243,6 +243,13 @@ namespace CodingTracker.jrazorx.Controllers
             {
                 _userInterface.DisplayMessage("Deletion cancelled.");
             }
+        }
+
+        private async Task ViewReportsAsync()
+        {
+            string period = _userInterface.GetReportPeriod();
+            var report = await _sessionService.GenerateReportAsync(period);
+            _userInterface.DisplayReport(report, period);
         }
     }
 }

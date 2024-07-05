@@ -59,5 +59,21 @@ namespace CodingTracker.jrazorx.Services
         {
             await _repository.DeleteSessionAsync(id);
         }
+
+        public async Task<(TimeSpan TotalTime, TimeSpan AverageTime, int SessionCount)> GenerateReportAsync(string period)
+        {
+            var sessions = await GetSessionsByPeriodAsync(period);
+
+            TimeSpan totalTime = TimeSpan.Zero;
+            foreach (var session in sessions)
+            {
+                totalTime += session.GetDuration();
+            }
+
+            int sessionCount = sessions.Count;
+            TimeSpan averageTime = sessionCount > 0 ? TimeSpan.FromTicks(totalTime.Ticks / sessionCount) : TimeSpan.Zero;
+
+            return (totalTime, averageTime, sessionCount);
+        }
     }
 }

@@ -9,7 +9,7 @@
         { MenuOption.ViewAllSessions, "View all sessions" },
         { MenuOption.UpdateSession, "Update a session" },
         { MenuOption.DeleteSession, "Delete a session" },
-        { MenuOption.ViewStatistics, "View Statistics" },
+        { MenuOption.ViewReports, "View Reports" },
         { MenuOption.Exit, "Exit" }
     };
 

@@ -7,7 +7,7 @@
         ViewAllSessions,
         UpdateSession,
         DeleteSession,
-        ViewStatistics,
+        ViewReports,
         Exit
     }
 }
