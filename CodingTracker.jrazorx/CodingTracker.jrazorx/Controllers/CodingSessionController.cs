@@ -10,13 +10,15 @@ namespace CodingTracker.jrazorx.Controllers
     public class CodingSessionController
     {
         private readonly CodingSessionService _sessionService;
+        private readonly CodingGoalService _codingGoalService;
         private readonly UserInterface _userInterface;
         private readonly InputValidator _inputValidator;
         private readonly Stopwatch _stopwatch;
 
-        public CodingSessionController(CodingSessionService sessionService, UserInterface userInterface, InputValidator inputValidator)
+        public CodingSessionController(CodingSessionService sessionService, CodingGoalService codingGoalService, UserInterface userInterface, InputValidator inputValidator)
         {
             _sessionService = sessionService;
+            _codingGoalService = codingGoalService;
             _userInterface = userInterface;
             _inputValidator = inputValidator;
             _stopwatch = new Stopwatch();
@@ -49,6 +51,9 @@ namespace CodingTracker.jrazorx.Controllers
                         break;
                     case MenuOption.ViewReports:
                         await ViewReportsAsync();
+                        break;
+                    case MenuOption.ManageCodingGoals:
+                        await ManageCodingGoalsAsync();
                         break;
                     case MenuOption.Exit:
                         exitRequested = true;
@@ -250,6 +255,104 @@ namespace CodingTracker.jrazorx.Controllers
             string period = _userInterface.GetReportPeriod();
             var report = await _sessionService.GenerateReportAsync(period);
             _userInterface.DisplayReport(report, period);
+        }
+
+        private async Task ManageCodingGoalsAsync()
+        {
+            bool exitRequested = false;
+
+            while (!exitRequested)
+            {
+                CodingGoalOption choice = _userInterface.GetCodingGoalMenuChoice();
+
+                switch (choice)
+                {
+                    case CodingGoalOption.AddGoal:
+                        await AddCodingGoalAsync();
+                        break;
+                    case CodingGoalOption.ViewGoals:
+                        await ViewCodingGoalsAsync();
+                        break;
+                    case CodingGoalOption.UpdateGoal:
+                        await UpdateCodingGoalAsync();
+                        break;
+                    case CodingGoalOption.DeleteGoal:
+                        await DeleteCodingGoalAsync();
+                        break;
+                    case CodingGoalOption.Back:
+                        exitRequested = true;
+                        break;
+                }
+
+                if (!exitRequested)
+                {
+                    _userInterface.WaitForKeyPress();
+                }
+            }
+        }
+
+        private async Task AddCodingGoalAsync()
+        {
+            var goal = _userInterface.GetCodingGoalInput();
+            await _codingGoalService.AddGoalAsync(goal);
+            _userInterface.DisplayMessage("Coding goal added successfully.");
+        }
+
+        private async Task ViewCodingGoalsAsync()
+        {
+            var goals = await _codingGoalService.GetGoalsAsync();
+            var hoursPerDay = new Dictionary<int, double>();
+            var totalHoursSpent = new Dictionary<int, double>();
+
+            foreach (var goal in goals)
+            {
+                hoursPerDay[goal.Id] = await _codingGoalService.GetHoursPerDayForGoalAsync(goal);
+                totalHoursSpent[goal.Id] = await _codingGoalService.GetTotalHoursSpentForGoalAsync(goal);
+            }
+
+            _userInterface.DisplayCodingGoals(goals, hoursPerDay, totalHoursSpent);
+        }
+
+        private async Task UpdateCodingGoalAsync()
+        {
+            await ViewCodingGoalsAsync();
+            int goalId = _userInterface.GetInteger("Enter the ID of the goal you want to update:");
+            var goal = await _codingGoalService.GetGoalByIdAsync(goalId);
+
+            if (goal == null)
+            {
+                _userInterface.DisplayError("Goal not found.");
+                return;
+            }
+
+            var updatedGoal = _userInterface.GetCodingGoalInput(goal);
+            await _codingGoalService.UpdateGoalAsync(updatedGoal);
+            _userInterface.DisplayMessage("Coding goal updated successfully.");
+        }
+
+        private async Task DeleteCodingGoalAsync()
+        {
+            await ViewCodingGoalsAsync();
+            int goalId = _userInterface.GetInteger("Enter the ID of the goal you want to delete:");
+            var goal = await _codingGoalService.GetGoalByIdAsync(goalId);
+
+            if (goal == null)
+            {
+                _userInterface.DisplayError("Goal not found.");
+                return;
+            }
+
+            bool confirmDelete = _userInterface.GetConfirmation($"Are you sure you want to delete the goal with ID {goalId}?");
+
+            if (confirmDelete)
+            {
+                await _codingGoalService.DeleteGoalAsync(goalId);
+                _userInterface.DisplayMessage("Coding goal deleted successfully.");
+            }
+            else
+            {
+                _userInterface.DisplayMessage("Deletion cancelled.");
+            }
         }
     }
 }

@@ -8,6 +8,7 @@
         UpdateSession,
         DeleteSession,
         ViewReports,
+        ManageCodingGoals,
         Exit
     }
 }

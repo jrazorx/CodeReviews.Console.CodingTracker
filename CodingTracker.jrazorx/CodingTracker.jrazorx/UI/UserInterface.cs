@@ -165,6 +165,78 @@ namespace CodingTracker.jrazorx.UI
             return new DateTime(year, month, day, hours, minutes, 0);
         }
 
+        private DateTime GetDate(string prompt, DateTime? defaultDateTime = null)
+        {
+            DisplayTitle(prompt);
+
+            var referenceDateTime = defaultDateTime ?? DateTime.Now;
+
+            // Year selection
+            var year = AnsiConsole.Prompt(
+                new TextPrompt<int>("Enter the [green]year[/] [blue][[0-9999]][/] ")
+                    .DefaultValue(referenceDateTime.Year)
+                    .PromptStyle("yellow")
+                    .ValidationErrorMessage("[red]That's not a valid year[/]")
+                    .Validate(year =>
+                    {
+                        return year switch
+                        {
+                            < 0 => ValidationResult.Error("[red]The year must be at least 0[/]"),
+                            > 9999 => ValidationResult.Error("[red]The year must be less than or equal to 9999[/]"),
+                            _ => ValidationResult.Success(),
+                        };
+                    })
+            );
+
+            // Month selection
+            var monthPrompt = new TextPrompt<int>("Enter the [green]month[/] [blue][[1-12]][/] ")
+                .PromptStyle("yellow")
+                .ValidationErrorMessage("[red]That's not a valid month[/]")
+                .Validate(month =>
+                {
+                    return month switch
+                    {
+                        < 1 => ValidationResult.Error("[red]The month must be 1 or greater[/]"),
+                        > 12 => ValidationResult.Error("[red]The month must be 12 or less[/]"),
+                        _ => ValidationResult.Success(),
+                    };
+                });
+
+            if (year == referenceDateTime.Year)
+            {
+                monthPrompt = monthPrompt.DefaultValue(referenceDateTime.Month);
+            }
+
+            var month = AnsiConsole.Prompt(monthPrompt);
+
+            // Day selection
+            int maxDays = DateTime.DaysInMonth(year, month);
+            var dayPrompt = new TextPrompt<int>($"Enter the [green]day[/] [blue][[1-{maxDays}]][/] ")
+                .PromptStyle("yellow")
+                .ValidationErrorMessage("[red]That's not a valid day[/]")
+                .Validate(day =>
+                {
+                    if (day < 1)
+                    {
+                        return ValidationResult.Error("[red]The day must be 1 or greater[/]");
+                    }
+                    else if (day > maxDays)
+                    {
+                        return ValidationResult.Error($"[red]The day must be {maxDays} or less for {CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month)} {year}[/]");
+                    }
+                    return ValidationResult.Success();
+                });
+
+            if (year == referenceDateTime.Year && month == referenceDateTime.Month)
+            {
+                dayPrompt = dayPrompt.DefaultValue(referenceDateTime.Day);
+            }
+
+            var day = AnsiConsole.Prompt(dayPrompt);
+
+            return new DateTime(year, month, day);
+        }
+
         public void DisplaySessions(List<CodingSession> sessions)
         {
             AnsiConsole.Clear();
@@ -296,6 +368,61 @@ namespace CodingTracker.jrazorx.UI
         private string FormatTimeSpan(TimeSpan time)
         {
             return $"{(int)time.TotalHours:D2}:{time.Minutes:D2}:{time.Seconds:D2}";
+        }
+
+        public CodingGoalOption GetCodingGoalMenuChoice()
+        {
+            AnsiConsole.Clear();
+            DisplayTitle("Manage Coding Goals");
+
+            return AnsiConsole.Prompt(
+                new SelectionPrompt<CodingGoalOption>()
+                    .Title("Select an option:")
+                    .AddChoices(Enum.GetValues(typeof(CodingGoalOption)).Cast<CodingGoalOption>())
+                    .UseConverter(o => o.GetDisplayText()));
+        }
+
+        public void DisplayCodingGoals(IEnumerable<CodingGoal> goals, Dictionary<int, double> hoursPerDay, Dictionary<int, double> totalHoursSpent)
+        {
+            AnsiConsole.Clear();
+            DisplayTitle("Coding Goals");
+
+            var table = new Table();
+            table.AddColumn("ID");
+            table.AddColumn("Start Date");
+            table.AddColumn("End Date");
+            table.AddColumn("Target Hours");
+            table.AddColumn("Hours Spent");
+            table.AddColumn("Hours/Day to Reach Goal");
+
+            foreach (var goal in goals)
+            {
+                string hoursPerDayStr = hoursPerDay.TryGetValue(goal.Id, out double hours) ? hours.ToString("F2") : "N/A";
+                table.AddRow(
+                    goal.Id.ToString(),
+                    goal.StartDate.ToString("yyyy-MM-dd"),
+                    goal.EndDate.ToString("yyyy-MM-dd"),
+                    goal.TargetHours.ToString(),
+                    totalHoursSpent[goal.Id].ToString("F2"),
+                    hoursPerDayStr
+                );
+            }
+
+            AnsiConsole.Write(table);
+        }
+
+        public CodingGoal GetCodingGoalInput(CodingGoal? existingGoal = null)
+        {
+            var goal = existingGoal ?? new CodingGoal();
+
+            goal.StartDate = GetDate("Enter the start date for the goal (yyyy-MM-dd)", existingGoal?.StartDate.Date ?? DateTime.Now.Date);
+            goal.EndDate = GetDate("Enter the end date for the goal (yyyy-MM-dd)", existingGoal?.EndDate.Date ?? null);
+            goal.TargetHours = AnsiConsole.Prompt(
+                new TextPrompt<int>("Enter the target hours for the goal:")
+                    .DefaultValue(existingGoal?.TargetHours ?? 100)
+                    .Validate(hours => hours > 0 ? ValidationResult.Success() : ValidationResult.Error("Target hours must be greater than 0")));
+            
+            return goal;
         }
     }
 }

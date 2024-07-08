@@ -10,6 +10,7 @@
         { MenuOption.UpdateSession, "Update a session" },
         { MenuOption.DeleteSession, "Delete a session" },
         { MenuOption.ViewReports, "View Reports" },
+        { MenuOption.ManageCodingGoals, "Manage Coding Goals" },
         { MenuOption.Exit, "Exit" }
     };
 

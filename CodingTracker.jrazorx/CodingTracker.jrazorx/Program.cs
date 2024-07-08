@@ -10,13 +10,16 @@ namespace CodingTracker
     {
         static async Task Main(string[] args)
         {
-            var repository = new CodingSessionRepository();
-            var sessionService = new CodingSessionService(repository);
+            var codingSessionRepository = new CodingSessionRepository();
+            var codingGoalRepository = new CodingGoalRepository();
+            var codingSessionService = new CodingSessionService(codingSessionRepository);
+            var goalService = new CodingGoalService(codingGoalRepository, codingSessionService);
             var userInterface = new UserInterface();
             var inputValidator = new InputValidator();
-            var codingController = new CodingSessionController(sessionService, userInterface, inputValidator);
+            var codingController = new CodingSessionController(codingSessionService, goalService, userInterface, inputValidator);
 
-            await sessionService.InitializeDatabaseAsync();
+            await codingSessionService.InitializeDatabaseAsync();
+            await goalService.InitializeDatabaseAsync();
             await codingController.RunAsync();
         }
     }
